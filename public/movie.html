@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фільм</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="topbar">
+            <a class="back-link" href="index.html">← До списку</a>
+            <h1 id="movie-title">Завантаження...</h1>
+        </div>
+    </header>
+
+    <main>
+        <section class="panel">
+            <div class="movie-info">
+                <p><strong>Жанр:</strong> <span id="movie-genre">Завантаження...</span></p>
+                <div id="movie-details"></div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Відгуки</h2>
+            <div id="review-list" class="review-list"></div>
+        </section>
+
+        <section class="panel form-panel">
+            <h2>Додати відгук</h2>
+            <form id="review-form">
+                <label>
+                    Ім'я
+                    <input id="review-author" required>
+                </label>
+                <label>
+                    Рейтинг
+                    <select id="review-rating" required>
+                        <option value="">Оберіть</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </label>
+                <label>
+                    Текст
+                    <textarea id="review-text" rows="4" required></textarea>
+                </label>
+                <button type="submit">Додати відгук</button>
+                <div id="review-message" class="message"></div>
+            </form>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
