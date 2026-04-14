@@ -1,6 +1,7 @@
 const safeSortOptions = ['title', 'year', 'rating']
 
 let currentPage = 1
+const API = '/api/movies'
 
 async function fetchJson(url, options = {}) {
     const response = await fetch(url, {
