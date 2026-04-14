@@ -5,24 +5,44 @@ const db = require('../db/database')
 
 router.get('/', (req, res) => {
     try {
-        const { search, genre, sort } = req.query;
+        const { search, genre, sort, page = 1, limit = 30 } = req.query;
         let query = 'SELECT m.id, m.title, m.year, m.description, m.rating, g.name as genre_name FROM movies as m LEFT JOIN genres as g ON m.genre_id = g.id'
         const params = [];
+        let whereClause = '';
 
         if (search) {
-            query += ' WHERE m.title LIKE ?';
+            whereClause += ' WHERE m.title LIKE ?';
             params.push(`%${search}%`);
         }
         if (genre) {
-            query += params.length ? ' AND m.genre_id = ?' : ' WHERE m.genre_id = ?';
+            whereClause += params.length ? ' AND m.genre_id = ?' : ' WHERE m.genre_id = ?';
             params.push(parseInt(genre));
         }
+        query += whereClause;
+
         if (sort) {
             query += ` ORDER BY m.${sort}`;
         }
 
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        query += ' LIMIT ? OFFSET ?';
+        params.push(parseInt(limit), offset);
+
         const movies = db.prepare(query).all(...params);
-        res.status(200).json(movies);
+
+        let countQuery = 'SELECT COUNT(*) as total FROM movies as m';
+        if (whereClause) countQuery += whereClause;
+        const total = db.prepare(countQuery).get(...params.slice(0, params.length - 2)).total;
+
+        res.status(200).json({
+            movies,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages: Math.ceil(total / parseInt(limit))
+            }
+        });
     } catch (error) {
         console.error('Помилка при отриманні фільмів:', error);
         res.status(500).json({ success: false, message: 'Помилка сервера' });

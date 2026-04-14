@@ -1,6 +1,6 @@
-const API = '/api/movies'
-
 const safeSortOptions = ['title', 'year', 'rating']
+
+let currentPage = 1
 
 async function fetchJson(url, options = {}) {
     const response = await fetch(url, {
@@ -38,6 +38,32 @@ function showMessage(container, text, type = 'info') {
     container.className = `message ${type}`
 }
 
+function renderPagination(pagination, container) {
+    container.innerHTML = ''
+    if (pagination.totalPages <= 1) return
+
+    const createButton = (text, page, disabled = false) => {
+        const button = document.createElement('button')
+        button.textContent = text
+        button.disabled = disabled
+        if (page === pagination.page) button.classList.add('active')
+        button.addEventListener('click', () => loadMovies(page))
+        return button
+    }
+
+    if (pagination.page > 1) {
+        container.appendChild(createButton('Попередня', pagination.page - 1))
+    }
+
+    for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.totalPages, pagination.page + 2); i++) {
+        container.appendChild(createButton(i, i))
+    }
+
+    if (pagination.page < pagination.totalPages) {
+        container.appendChild(createButton('Наступна', pagination.page + 1))
+    }
+}
+
 function renderMovieList(movies, container) {
     container.innerHTML = ''
     if (!movies.length) {
@@ -64,22 +90,25 @@ function renderMovieList(movies, container) {
     })
 }
 
-async function loadMovies() {
+async function loadMovies(page = 1) {
+    currentPage = page
     const search = document.getElementById('search').value.trim()
     const genre = document.getElementById('filter-genre').value
     const sort = document.getElementById('sort').value
     const message = document.getElementById('movies-message')
     const list = document.getElementById('movie-list')
+    const pagination = document.getElementById('pagination')
 
     try {
-        let query = []
+        let query = [`page=${page}`, `limit=30`]
         if (search) query.push(`search=${encodeURIComponent(search)}`)
         if (genre) query.push(`genre=${encodeURIComponent(genre)}`)
         if (sort && safeSortOptions.includes(sort)) query.push(`sort=${encodeURIComponent(sort)}`)
-        const url = query.length ? `${API}?${query.join('&')}` : API
-        const movies = await fetchJson(url)
-        renderMovieList(movies, list)
-        showMessage(message, `Знайдено ${movies.length} фільм(ів).`, 'success')
+        const url = `${API}?${query.join('&')}`
+        const data = await fetchJson(url)
+        renderMovieList(data.movies, list)
+        renderPagination(data.pagination, pagination)
+        showMessage(message, `Знайдено ${data.pagination.total} фільм(ів). Сторінка ${data.pagination.page} з ${data.pagination.totalPages}.`, 'success')
     } catch (error) {
         showMessage(message, 'Не вдалося завантажити фільми.', 'error')
         console.error(error)
@@ -116,9 +145,9 @@ async function initIndexPage() {
     await loadGenres(genreSelect)
     await loadGenres(formGenre, false)
 
-    document.getElementById('search').addEventListener('input', () => loadMovies())
-    document.getElementById('filter-genre').addEventListener('change', () => loadMovies())
-    document.getElementById('sort').addEventListener('change', () => loadMovies())
+    document.getElementById('search').addEventListener('input', () => loadMovies(1))
+    document.getElementById('filter-genre').addEventListener('change', () => loadMovies(1))
+    document.getElementById('sort').addEventListener('change', () => loadMovies(1))
 
     list.addEventListener('click', async (event) => {
         const button = event.target.closest('button')

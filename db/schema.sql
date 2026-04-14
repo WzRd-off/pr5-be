@@ -1,10 +1,10 @@
--- Таблица жанров
+-- Таблиця жанрів
 CREATE TABLE IF NOT EXISTS genres (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE
 );
 
--- Таблица фильмов
+-- Таблиця фільмів
 CREATE TABLE IF NOT EXISTS movies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS movies (
     FOREIGN KEY (genre_id) REFERENCES genres(id)
 );
 
--- Таблица отзывов
+-- Таблиця відгуків
 CREATE TABLE IF NOT EXISTS reviews (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     movie_id INTEGER,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (movie_id) REFERENCES movies(id)
 );
 
--- Заполнение жанров
+-- Заполвнення жанрів
 INSERT OR IGNORE INTO genres (name) VALUES
 ('Драма'),
 ('Комедія'),

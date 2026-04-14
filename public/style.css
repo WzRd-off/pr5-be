@@ -145,6 +145,24 @@ button:hover {
 }
 
 
-.hidden {
-    display: none !important;
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+.pagination button {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.pagination button.active {
+    background: #2563eb;
+    color: #fff;
+}
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
